@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+. bpm
+bpm::include unittest
+unittest::run
+
+unittest::setup() {
+    . ../libarray
+}
+
+unittest::case::zero() {
+    local result
+
+    array::join result , || return 1
+    [[ "$result" == "" ]]
+}
+
+unittest::case::one() {
+    local result
+
+    array::join result , one || return 1
+    [[ "$result" == "one" ]]
+}
+
+unittest::case::two() {
+    local result
+
+    array::join result , one two || return 1
+    [[ "$result" == "one,two" ]]
+}
+
+unittest::case::no-delimiter() {
+    local result
+
+    array::join result "" one two || return 1
+    [[ "$result" == "onetwo" ]]
+}

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+. bpm
+bpm::include unittest
+unittest::run
+
+unittest::setup() {
+    . ../libarray
+}
+
+unittest::case::first() {
+    array::contains one one two three four
+}
+
+unittest::case::last() {
+    array::contains four one two three four
+}
+
+unittest::case::negative() {
+    ! array::contains five one two three four
+}
+
+unittest::case::empty() {
+    ! array::contains one
+}
+
+unittest::case::spaces-found() {
+    array::contains "3 3" one two "3 3" four
+}
+
+unittest::case::spaces-not-found() {
+    ! array::contains one "one one" two
+}

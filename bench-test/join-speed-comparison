@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+. bpm
+bpm::include bench
+
+# A little slower
+joinLoop() {
+    local joiner part result
+
+    joiner=${1-}
+    result=${2-}
+
+    if [[ "$#" -gt 2 ]]; then
+        # Can't shift earlier because extra args are optional.
+        shift 2
+
+        for part in "$@"; do
+            result+="$joiner$part"
+        done
+    fi
+}
+
+# Faster because it doesn't have to loop. Only slower when there are very few
+# items in the list or none at all.
+joinPrintf() {
+    local joiner part result
+
+    joiner=${1-}
+    shift
+    printf -v result "$joiner%s" "$@"
+    result=${result:${#joiner}}
+}
+
+# An attempt to get more performance. Doesn't seem to pay off enough to
+# warrant the extra code.
+joinHybrid() {
+    local joiner part result
+
+    joiner=${1-}
+
+    if [[ "$#" -gt 2 ]]; then
+        shift
+        printf -v result "$joiner%s" "$@"
+        result=${result:${#joiner}}
+    else
+        result=${2-}
+    fi
+}
+
+for method in joinLoop joinHybrid joinPrintf; do
+    eval "bench::test::empty::$method() { $method ,; }"
+    eval "bench::test::1-value::$method() { $method , 1; }"
+    eval "bench::test::3-values::$method() { $method , 1 2 3; }"
+    eval "bench::test::500-values::$method() { $method , {1..500} ; }"
+done
+
+bench::auto

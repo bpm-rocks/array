@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+. bpm
+bpm::include unittest
+unittest::run
+
+unittest::setup() {
+    . ../libarray
+}
+
+unittest::case::first() {
+    local result
+
+    array::indexOf result one one two three four || return 1
+    [[ "$result" -eq 0 ]]
+}
+
+unittest::case::last() {
+    local result
+
+    array::indexOf result four one two three four || return 1
+    [[ "$result" -eq 3 ]]
+}
+
+unittest::case::spaces() {
+    local result
+
+    array::indexOf result "3 3" one two "3 3" four || return 1
+    [[ "$result" -eq 2 ]]
+}
+
+unittest::case::not-found() {
+    local result
+
+    result="before"
+    array::indexOf result five one two three four && return 1
+    [[ "$result" == "before" ]]
+}
+
+unittest::case::no-array() {
+    local result
+
+    result="before"
+    array::indexOf result one && return 1
+    [[ "$result" == "before" ]]
+}
