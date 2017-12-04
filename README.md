@@ -52,6 +52,38 @@ Examples
 Returns true (0) if $1 is found in the list of other arguments, false (1) otherwise.
 
 
+`array::filter()`
+-----------------
+
+Run a list of values through a filter. When the filter returns an error, remove that element from the list.
+
+* $1    - Variable name where the final list will be placed.
+* $2    - Function or command to run. Receives one argument: a single value from the list.
+* $3-$@ - List of values in the array.
+
+Examples
+
+    removeAnimals() {
+        case "$1" in
+            dog|cat|cow|moose)
+                # Return failure and the elements will be removed.
+                return 1
+                ;;
+        esac
+
+        return 0
+    }
+
+    words=(a dog and a cat chased a cow)
+    array::filter filtered removeAnimals "${words[@]}"
+
+    # Prints "a and a chased a". The special hyphen allows you to print an
+    # empty array in strict mode.
+    echo "${filtered[@]-}"
+
+Returns nothing.
+
+
 `array::indexOf()`
 ------------------
 

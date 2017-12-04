@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+. bpm
+bpm::include unittest
+unittest::run
+
+removeAnimals() {
+    case "$1" in
+        dog|cat|cow|moose)
+            return 1
+    esac
+
+    return 0
+}
+
+unittest::setup() {
+    . ../libarray
+}
+
+unittest::case::example() {
+    local result
+
+    array::filter result removeAnimals a dog and a cat chased a cow
+    [[ "${#result[@]}" == 5 ]] || return 1
+    [[ "${result[*]}" == "a and a chased a" ]]
+}
+
+unittest::case::filtered-all() {
+    local result
+
+    result="whatever"
+    array::filter result removeAnimals moose cow cat dog
+    [[ "${#result[@]}" == 0 ]] || return 1
+    [[ -z "${result-}" ]]
+}
